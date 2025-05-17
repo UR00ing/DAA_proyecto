@@ -8,20 +8,29 @@ def	MetodoMalla(n,m):
 	"""
 	#	Generacion del grafo
 	gr0	=	gp.Graph('malla0')
+	#	Se crean todos los nodos
+	for	T	in	range(n*m):
+		gr0.addNode(str(T))
 	#	Se crean los nodos por fila y columna
-	for	i	in	range(n):
-		for	j	in	range(m):
-			#	Se crea el nombre del nodo y se genera
-			name	=	str((m*i)+j)
-			gr0.addNode(name)
+		#	Se definen los contadores para los nombres de las aristas
+		#	horizontales y verticales
+	h_count	=	0
+	v_count	=	0
+	for	i	in	range(n):	# filas
+		for	j	in	range(m):	# columnas
+			nodo_actual	=	(i*m)+j
 			#	Si el nodo está en la segunda columna o despues entonces se conecta 
 			#	con el nodo de la columna anterior anterior en la misma fila
-			if	j	>	0:
-				gr0.addEdge("f"+str((n*i)+j-1),str(int(name)-1),name)
+			if	j	<	m-1:
+				nodo_der	=	nodo_actual	+	1
+				gr0.addEdge('h'	+	str(h_count),str(nodo_actual),str(nodo_der))
+				h_count	+=	1
 			#	Si el nodo está en la segunda fila o despues entonces se conecta
 			#	con el nodo de la fila anterior en la misma columa
-			if	i	>	0:
-				gr0.addEdge("c"+str(((i-1)*m)+j),str(int(name)-m),name)
+			if	i	<	n-1:
+				nodo_down	=	nodo_actual	+	m
+				gr0.addEdge('v'	+	str(v_count),str(nodo_actual),str(nodo_down))
+				v_count	+=	1
 	#	Se regresa el grafo
 	return	gr0
 
@@ -47,8 +56,9 @@ def	MetodoErdosyRenyi(n,m):
 			#	Si ya existe la arista en cualquiera de los sentidos entonces se ignora
 			if	not gr0.edge_exist(str(n0)+str(n1))	and	not gr0.edge_exist(str(n1)+str(n0)):
 				#	Se agrga la arista y se cuenta
-				gr0.addEdge(str(n0)+str(n1),n0,n1)
-				ed	+=	1
+				E	=	gr0.addEdge(str(n0)+str(n1),n0,n1)
+				if	E	!=	None:
+					ed	+=	1
 	#	Se regresa el grafo
 	return	gr0
 

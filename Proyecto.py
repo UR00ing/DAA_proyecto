@@ -4,88 +4,73 @@ import	pathlib		as	pl
 
 #	Directorios a usar
 Dir			=	pl.Path(__file__).parent.absolute()
-Dir			=	Dir / "proyecto_2"
-DirS		=	Dir	/	"SaveGraph"
-DirBFS		=	Dir	/	"SaveGraph/BFS"
-DirDFSi		=	Dir	/	"SaveGraph/DFSi"
-DirDFSr		=	Dir	/	"SaveGraph/DFSr"
+Dir			=	Dir / "proyecto_3"
+DirS		=	Dir	/	"Graph"
+DirDijkstra	=	Dir	/	"Dijkstra"
+
+# Crear los directorios si no existen (incluyendo el directorio padre proyecto_3)
+Dir.mkdir(exist_ok=True)
+DirS.mkdir(exist_ok=True)
+DirDijkstra.mkdir(exist_ok=True)
 
 """
-Funcion para obtener los nombres de los archivos en un directorio
+Generacion de los grafos mediante generadores aleatorios
 """
-def	List_files_on(addr):
-	lista_nombres = []
-	for archivo in pl.Path(addr).iterdir():
-		if archivo.is_file() and archivo.suffix == '.gv':
-			lista_nombres.append(archivo.stem)  # .stem elimina automáticamente la extensión
-	return	lista_nombres
+#	pocos	80 aprox
+#PgrMalla		=	alg.MetodoMalla(9,9)
+#PgrEyR			=	alg.MetodoErdosyRenyi(80,180)
+#PGilbert		=	alg.MetodoGilbert(80,0.3)
+#PGeoGraph		=	alg.MetodoGeoSimp(80,0.35)
+#PBarabasi		=	alg.MetodoBarabasiAlbert(80,5)
+#PDorogovtsev	=	alg.MetodoDorogovtsev(80)
+#PgrMalla.GraphViz('01Malla,9,9',DirS)
+#PgrEyR.GraphViz('01Erdos,80,180',DirS)
+#PGilbert.GraphViz('01Gilbert,80,0_3',DirS)
+#PGeoGraph.GraphViz('01Geografico,80,0_35',DirS)
+#PBarabasi.GraphViz('01Barabasi,80,5',DirS)
+#PDorogovtsev.GraphViz('01Dorogovtsev,80',DirS)
+#	muchos	350 aprox
+MgrMalla		=	alg.MetodoMalla(18,20)
+MgrEyR			=	alg.MetodoErdosyRenyi(350,900)
+MGilbert		=	alg.MetodoGilbert(350,0.05)
+MBarabasi		=	alg.MetodoBarabasiAlbert(350,5)
+MGeoGraph		=	alg.MetodoGeoSimp(350,0.12)
+MDorogovtsev	=	alg.MetodoDorogovtsev(350)
+MgrMalla.GraphViz('02Malla,18,20',DirS)
+MgrEyR.GraphViz('02Erdos,350,900',DirS)
+MGilbert.GraphViz('02Gilbert,350,0_05',DirS)
+MGeoGraph.GraphViz('02Geografico,350,0_12',DirS)
+MBarabasi.GraphViz('02Barabasi,350,5',DirS)
+MDorogovtsev.GraphViz('02Dorogovtsev,350',DirS)
 
 """
-Para proyecto 1
-se crean los grafos con los metodos de generacion
+Dijkstra
 """
-#	30 nodos
-grMalla		=	alg.MetodoMalla(6,5)
-grMalla.GraphViz('1Malla,6,5',DirS)
-grEyR		=	alg.MetodoErdosyRenyi(30,75)
-grEyR.GraphViz('1Erdos,30,75',DirS)
-Gilbert		=	alg.MetodoGilbert(30,0.5)
-Gilbert.GraphViz('1Gilbert,30,0_5',DirS)
-GeoGraph	=	alg.MetodoGeoSimp(30,0.40)
-GeoGraph.GraphViz('1Geografico,30,0_40',DirS)
-Barabasi	=	alg.MetodoBarabasiAlbert(30,4)
-Barabasi.GraphViz('1Barabasi,30,4',DirS)
-Dorogovtsev	=	alg.MetodoDorogovtsev(30)
-Dorogovtsev.GraphViz('1Dorogovtsev,30',DirS)
-#	100 nodos
-grMalla		=	alg.MetodoMalla(10,10)
-grMalla.GraphViz('2Malla,10,10',DirS)
-grEyR		=	alg.MetodoErdosyRenyi(100,250)
-grEyR.GraphViz('2Erdos,100,250',DirS)
-Gilbert		=	alg.MetodoGilbert(100,0.3)
-Gilbert.GraphViz('2Gilbert,100,0_3',DirS)
-GeoGraph	=	alg.MetodoGeoSimp(100,0.3)
-GeoGraph.GraphViz('2Geografico,100,0_3',DirS)
-Barabasi	=	alg.MetodoBarabasiAlbert(100,4)
-Barabasi.GraphViz('2Barabasi,100,4',DirS)
-Dorogovtsev	=	alg.MetodoDorogovtsev(100)
-Dorogovtsev.GraphViz('2Dorogovtsev,100',DirS)
-#	500 nodos
-grMalla		=	alg.MetodoMalla(29,18)
-grMalla.GraphViz('3Malla,29,18',DirS)
-grEyR		=	alg.MetodoErdosyRenyi(500,1300)
-grEyR.GraphViz('3Erdos,500,1300',DirS)
-Gilbert		=	alg.MetodoGilbert(500,0.15)
-Gilbert.GraphViz('3Gilbert,500,0_15',DirS)
-GeoGraph	=	alg.MetodoGeoSimp(500,0.25)
-GeoGraph.GraphViz('3Geografico,500,0_25',DirS)
-Barabasi	=	alg.MetodoBarabasiAlbert(500,5)
-Barabasi.GraphViz('3Barabasi,500,5',DirS)
-Dorogovtsev	=	alg.MetodoDorogovtsev(500)
-Dorogovtsev.GraphViz('3Dorogovtsev,500',DirS)
+#	pocos
+#PgrMallaDijkstra		=	PgrMalla.Dijkstra()
+#PgrEyRDijkstra			=	PgrEyR.Dijkstra()
+#PGilbertDijkstra		=	PGilbert.Dijkstra()
+#PGeoGraphDijkstra		=	PGeoGraph.Dijkstra()
+#PBarabasiDijkstra		=	PBarabasi.Dijkstra()
+#PDorogovtsevDijkstra	=	PDorogovtsev.Dijkstra()
+#	muchos
+MgrMallaDijkstra		=	MgrMalla.Dijkstra()
+MgrEyRDijkstra			=	MgrEyR.Dijkstra()
+MGilbertDijkstra		=	MGilbert.Dijkstra()
+MBarabasiDijkstra		=	MBarabasi.Dijkstra()
+MGeoGraphDijkstra		=	MGeoGraph.Dijkstra()
+MDorogovtsevDijkstra	=	MDorogovtsev.Dijkstra()
 
-"""
-Para proyecto 2
-se leen los grafos y se crean los arboles con los 
-metodos BFS y DFS(para metodo iterativo y recursivo)
-"""
+#PgrMallaDijkstra.GraphVizDijkstra('01MallaDijkstra,9,9',DirDijkstra)
+#PgrEyRDijkstra.GraphVizDijkstra('01ErdosDijkstra,80,180',DirDijkstra)
+#PGilbertDijkstra.GraphVizDijkstra('01GilbertDijkstra,80,0_3',DirDijkstra)
+#PGeoGraphDijkstra.GraphVizDijkstra('01GeograficoDijkstra,80,0_35',DirDijkstra)
+#PBarabasiDijkstra.GraphVizDijkstra('01BarabasiDijkstra,80,5',DirDijkstra)
+#PDorogovtsevDijkstra.GraphVizDijkstra('01DorogovtsevDijkstra,80',DirDijkstra)
 
-#	Lectura de los archivos
-grafos	=	[]
-names	=	List_files_on(DirS)
-for	l	in	names:
-	grafos.append(gp.Graph(l).load_graph(l,DirS))
-TempOrder	=	[]
-GRtemp		=	gp.Graph()
-#	Creacion de arboles en BFS
-for i in range(len(names)):
-	TempOrder,GRtemp	=	grafos[i].BFS()
-	GRtemp.GraphViz(names[i].replace('\n', ''),DirBFS)
-#	Creacion de arboles en DFS iterativo
-for i in range(len(names)):
-	TempOrder,GRtemp	=	grafos[i].DFS_i()
-	GRtemp.GraphViz(names[i].replace('\n', ''),DirDFSi)
-#	Creacion de arboles en DFS recursivo
-for i in range(len(names)):
-	TempOrder,GRtemp	=	grafos[i].DFS_r()
-	GRtemp.GraphViz(names[i].replace('\n', ''),DirDFSr)
+MgrMallaDijkstra.GraphVizDijkstra('02MallaDijkstra,18,20',DirDijkstra)
+MgrEyRDijkstra.GraphVizDijkstra('02ErdosDijkstra,350,900',DirDijkstra)
+MGilbertDijkstra.GraphVizDijkstra('02GilbertDijkstra,350,0_05',DirDijkstra)
+MBarabasiDijkstra.GraphVizDijkstra('02GeograficoDijkstra,350,0_12',DirDijkstra)
+MGeoGraphDijkstra.GraphVizDijkstra('02BarabasiDijkstra,350,5',DirDijkstra)
+MDorogovtsevDijkstra.GraphVizDijkstra('02DorogovtsevDijkstra,350',DirDijkstra)
