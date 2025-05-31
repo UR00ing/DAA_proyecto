@@ -696,3 +696,14 @@ class	Graph:
 						queue.heappush(Q, (a[v], v))
 		
 		return arbol
+	
+	def graph_weight(self):
+		"""
+		Calcula el peso total del grafo sumando los pesos de cada arista.
+		"""
+		if not self.NODES:
+			return	0
+		weight	=	0
+		for edge in self.EDGES.values():
+			weight	=	weight	+	edge.WEIGHT
+		return	round(weight,4)
