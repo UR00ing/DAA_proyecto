@@ -8,6 +8,9 @@ EDGE	=	'edge'
 NEIG	=	'neighbor'
 POS		=	'position'
 DIST	=	'distancia de dijkstra'
+C_R		=	'color RGB(Red) 0-255'
+C_G		=	'color RGB(Green) 0-255'
+C_B		=	'color RGB(Blue) 0-255'
 
 class	Node:
 	"	NODO	"
@@ -22,6 +25,14 @@ class	Node:
 			NEIG:	[],
 			POS:	np.array([rd.random(),rd.random()])	#	x,y
 		}
+		# Generar R, G, B distintos entre sí para este nodo
+		while	True:
+			R	=	rd.randrange(0, 256)
+			G	=	rd.randrange(0, 256)
+			B	=	rd.randrange(0, 256)
+			if	R != G	and	G != B	and	R != B:		# Verificar que los 3 sean diferentes
+				self.ColorRGB	=	{C_R: R, C_G: G, C_B: B}
+				break
 
 class	Edge:
 	"	ARISTA	"
@@ -57,20 +68,29 @@ class	Graph:
 		"""
 		Entrega el diccionario de nodos del grafo
 		"""
-		return	self.NODES
+		return	self.NODES.values()
 	
 	def	get_edges(self):
 		"""
 		Entrega el diccionario de aristas del grafo
 		"""
-		return	self.EDGES
+		return	self.EDGES.values()
 
-	def addNode(self,id):
+	def addNode(self,id,RGB=[None,None,None]):
 		"""
 		Agrega un nodo al grafo
 		"""
+		R	=	RGB[0]
+		G	=	RGB[1]
+		B	=	RGB[2]
 		if id not in self.NODES:
 			self.NODES[str(id)]	=	Node(str(id))
+		if	(RGB[0]	!=	None):
+			self.NODES[str(id)].ColorRGB[C_R]	=	R
+		if	(RGB[1]	!=	None):
+			self.NODES[str(id)].ColorRGB[C_G]	=	G
+		if	(RGB[2]	!=	None):
+			self.NODES[str(id)].ColorRGB[C_B]	=	B
 		return	self.NODES[str(id)]
 	
 	def	addEdge(self,id,nodeSource,nodeTarget,weight=None):
@@ -105,9 +125,6 @@ class	Graph:
 		return edge
 	
 	def	GraphViz(self,GVdoc,GVdir="SaveGraph"):
-		"""
-		crea el archivo GV para gephi
-		"""
 		# Obtener el directorio actual del script
 		current_dir	=	pl.Path(__file__).parent.absolute()
 		save_dir	=	current_dir / GVdir
@@ -117,14 +134,11 @@ class	Graph:
 		file_dir	=	save_dir / f"{GVdoc}.gv"
 
 		nodelist	=	list(self.NODES.keys())
-		body	=	'graph G {\n'
+		body	=	'digraph X {\n'
 		for edge	in	self.EDGES.values():
-			node0		=	edge.SOURCE.id
-			node1		=	edge.TARGET.id
-			Weight		=	round(edge.WEIGHT,4)
-			nodoBody	=	str(node0)	+	' -- '	+	str(node1)
-			EdgeBody	=	' [label="'	+	str(Weight)	+	'"];\n'
-			body		+=	nodoBody	+	EdgeBody
+			node0	=	edge.SOURCE.id
+			node1	=	edge.TARGET.id
+			body	+=	str(node0)	+	' -> '	+	str(node1)	+	';\n'
 			if str(node0) in nodelist:
 				nodelist.remove(str(node0))
 			if str(node1) in nodelist:
@@ -148,7 +162,22 @@ class	Graph:
 		Verifica si una arista existe en el grafo
 		"""
 		return edge in self.EDGES.values()
-	
+
+	def	get_node_color(self,node):
+		"""
+		Obtiene el color RGB de un nodo especifico
+		"""
+		X	=	[]
+		if	str(node)	in	self.NODES:
+			X.append(self.NODES[str(node)].ColorRGB[C_R])
+			X.append(self.NODES[str(node)].ColorRGB[C_G])
+			X.append(self.NODES[str(node)].ColorRGB[C_B])
+		else:
+			X.append(None)
+			X.append(None)
+			X.append(None)
+		return	X
+
 	def get_node_pos(self, node):
 		"""
 		Obtiene la posición (POS) de un nodo específico
@@ -177,13 +206,17 @@ class	Graph:
 		"""
 		return	rd.choice(list(self.NODES.values()))
 
-	def	clone_Graph(self,name="self"):
+	def	clone_Graph(self,name="self",dir=None):
 		r	=	Graph()
 
 		if	name	==	"self":
 			r.NAME	=	self.NAME	+	"_Clone"
 		else:
 			r.NAME	=	str(name)
+		if	dir	==	None:
+			r.DIREC	=	'N'
+		else:
+			r.DIREC	=	dir
 		r.NODES	=	self.NODES.copy()
 		r.EDGES	=	self.EDGES.copy()
 
@@ -201,6 +234,24 @@ class	Graph:
 			return nodes
 		return	None
 	
+	def	node_change_color(self,id,color=[None,None,None]):
+		"""
+		Cambia el color de un nodo especifico manteniendo los valores no especificados 
+		en R, G o B, si el nodo no existe regresa None.
+		"""
+		if	str(id) not in self.NODES:
+			return	None
+		R	=	color[0]
+		G	=	color[1]
+		B	=	color[2]
+		if	(color[0]	!=	None):
+			self.NODES[str(id)].ColorRGB[C_R]	=	R
+		if	(color[1]	!=	None):
+			self.NODES[str(id)].ColorRGB[C_G]	=	G
+		if	(color[2]	!=	None):
+			self.NODES[str(id)].ColorRGB[C_B]	=	B
+		return	self.NODES[str(id)]
+
 	@staticmethod
 	def	load_graph(FileName,FileDir,GraphName=None):
 		"""
@@ -491,3 +542,157 @@ class	Graph:
 		file 	=	open(file_dir,'w+')
 		file.write(body)
 		print("ARCHIVO GUARDADO EXITOSAMENTE..")
+
+	def kruskal(self):
+		"""
+		Implementación de Kruskal.
+		"""
+		arbol = Graph(self.NAME	+	'_Kruskal', self.DIREC)
+		
+		if not self.NODES:
+			return arbol
+		
+		# Ordenar aristas por peso
+		edges = sorted(self.EDGES.values(), key=lambda e: e.WEIGHT)
+		
+		# Inicializar componentes conexas
+		comp_conexas = {node_id: i for i, node_id in enumerate(self.NODES)}
+		num_componentes = len(comp_conexas)
+		
+		# Agregar todos los nodos al Arbol de Expancion Minima
+		for node_id in self.NODES:
+			arbol.addNode(node_id, self.get_node_color(node_id))
+			arbol.NODES[node_id].attr[POS] = self.NODES[node_id].attr[POS].copy()
+		
+		edge_counter = 0
+		
+		for edge in edges:
+			if num_componentes == 1:
+				break
+				
+			u = edge.SOURCE.id
+			v = edge.TARGET.id
+			
+			if comp_conexas[u] != comp_conexas[v]:
+				# Agregar arista al Arbol de Expancion Minima
+				edge_id = f"k_e{edge_counter}"
+				arbol.addEdge(edge_id, u, v, edge.WEIGHT)
+				edge_counter += 1
+				
+				# Unir componentes
+				old_comp = comp_conexas[v]
+				new_comp = comp_conexas[u]
+				for node in comp_conexas:
+					if comp_conexas[node] == old_comp:
+						comp_conexas[node] = new_comp
+				num_componentes -= 1
+				
+		return arbol
+
+	def kruskal_inverso(self):
+		"""
+		Implementación de Kruskal inverso.
+		"""
+		if not self.NODES:
+			return Graph(self.NAME + '_Empty', self.DIREC)
+		
+		# Crear grafo para el arbol solo con nodos
+		arbol = Graph(self.NAME + '_Krsukal_inverso', self.DIREC)
+		for node_id in self.NODES:
+			arbol.addNode(node_id, self.get_node_color(node_id))
+		
+		# Ordenar aristas 
+		aristas_ordenadas = sorted(self.EDGES.values(), key=lambda e: e.WEIGHT)
+		
+		# Seleccionar las primeras aristas más ligeras que no formen ciclos
+		parent = {node_id: node_id for node_id in self.NODES}
+		
+		def find(node_id):
+			if parent[node_id] != node_id:
+				parent[node_id] = find(parent[node_id])
+			return parent[node_id]
+		
+		edge_count = 0
+		target_edges = len(self.NODES) - 1
+		
+		for edge in aristas_ordenadas:
+			if edge_count >= target_edges:
+				break
+			
+			u = edge.SOURCE.id
+			v = edge.TARGET.id
+			
+			root_u = find(u)
+			root_v = find(v)
+			
+			if root_u != root_v:
+				parent[root_v] = root_u
+				arbol.addEdge(f"ki_e{edge_count}", u, v, edge.WEIGHT)
+				edge_count += 1
+		
+		return arbol
+
+	def prim(self):
+		"""
+		Implementación del algoritmo de Prim
+		"""
+		if not self.NODES:
+			return Graph(self.NAME + '_Empty', self.DIREC)
+		
+		# Inicialización
+		a = {node_id: float('infinity') for node_id in self.NODES}	# a[v] ← ∞ para cada vértice
+		parent = {node_id: None for node_id in self.NODES}			# Para reconstruir el árbol
+		Q = []														# Cola de prioridad 
+		S = set()													# Conjunto de vértices incluidos
+		
+		# Seleccionar un nodo inicial aleatorio
+		start_node = self.get_random_node()
+		a[start_node.id] = 0
+		
+		# Inicializar la cola de prioridad
+		for node_id in self.NODES:
+			queue.heappush(Q, (a[node_id], node_id))
+		
+		# Crear el árbol de expansión mínima
+		arbol = Graph(self.NAME + '_Prim', self.DIREC)
+		
+		# Copiar todos los nodos al nuevo grafo
+		for node_id in self.NODES:
+			arbol.addNode(node_id, self.get_node_color(node_id))
+			arbol.NODES[node_id].attr[POS] = self.NODES[node_id].attr[POS].copy()
+		
+		edge_counter = 0
+		
+		while Q:
+			# Extraer el vértice con la clave más pequeña
+			current_a, u = queue.heappop(Q)
+			
+			if u in S:
+				continue
+			
+			S.add(u)  # S ← S ∪ {u}
+			
+			# Si no es el primer nodo, añadir la arista al arbol
+			if parent[u] is not None:
+				edge_id = 'prim_e'	+	str(edge_counter)
+				edge_counter += 1
+				arbol.addEdge(edge_id, parent[u], u, current_a)
+			
+			# Explorar todos los vecinos de u
+			for neighbor in self.NODES[u].attr[NEIG]:
+				v = neighbor.id
+				if v not in S:
+					# Encontrar el peso de la arista u-v
+					peso = None
+					for edge in self.NODES[u].attr[EDGE]:
+						if (edge.SOURCE.id == u and edge.TARGET.id == v) or \
+						   (edge.SOURCE.id == v and edge.TARGET.id == u):
+							peso = edge.WEIGHT
+							break
+					
+					if peso is not None and peso < a[v]:
+						a[v] = peso
+						parent[v] = u
+						queue.heappush(Q, (a[v], v))
+		
+		return arbol
